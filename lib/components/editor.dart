@@ -5,13 +5,17 @@ class Editor extends StatelessWidget {
   final String rotulo;
   final String dica;
   final IconData icone;
+  final String texto;
 
   Editor({
+    this.texto,
     this.controlador,
     this.rotulo,
     this.dica,
     this.icone,
-  });
+  }) {
+    this.controlador.text = texto;
+  }
 
   @override
   Widget build(BuildContext context) {

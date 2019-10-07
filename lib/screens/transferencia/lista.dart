@@ -1,9 +1,12 @@
+import 'dart:convert';
+
 import 'package:bytebank/components/item_transferencia.dart';
 import 'package:bytebank/dao/transferencia_dao.dart';
 import 'package:bytebank/models/transferencia.dart';
 import 'package:bytebank/screens/transferencia/formulario.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 const _tituloAppBar = 'Transferências';
 
@@ -16,6 +19,7 @@ class ListaTransferencias extends StatefulWidget {
 
 class ListaTransferenciasState extends State<ListaTransferencias> {
   final _dao = TransferenciaDao();
+  final _webClient = TransferenciaWebClient();
   final List<Transferencia> _transferencias = List();
 
   @override
@@ -26,6 +30,8 @@ class ListaTransferenciasState extends State<ListaTransferencias> {
 
   void _buscaTransferencias() async {
     List<Transferencia> novasTransferencias = await _dao.todasTransferencias();
+    List<Transferencia> transferenciasWeb = await _webClient.todas();
+    print(transferenciasWeb);
     if (novasTransferencias != null) {
       setState(() {
         _transferencias.addAll(novasTransferencias);
@@ -114,5 +120,33 @@ class ListaTransferenciasState extends State<ListaTransferencias> {
   void _edita(Transferencia transferencia) async {
     await _dao.edita(transferencia);
     _atualiza();
+  }
+}
+
+class TransferenciaWebClient {
+  Future<http.Response> buscaTransacoes() {
+    return http.get("http://192.168.1.221:8080/transacoes");
+  }
+
+  List<Transferencia> fromJson(Map<String, dynamic> json) {
+    return List.generate(
+      json.length,
+      (i) {
+        return Transferencia(
+          json['valor'],
+          json['numeroConta'],
+          id: json['id'],
+        );
+      },
+    );
+  }
+
+  Future<List<Transferencia>> todas() async {
+    final resposta = await buscaTransacoes();
+    if (resposta.statusCode == 200) {
+      final List jsond = json.decode(resposta.body);
+      return jsond.map((i) => Transferencia.deJson(i)).toList();
+    }
+    throw Exception('falha ao carregar transferencias');
   }
 }

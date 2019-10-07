@@ -9,4 +9,12 @@ class Transferencia {
   String toString() {
     return 'Transferencia{id: $id, valor: $valor, numeroConta: $numeroConta}';
   }
+
+  factory Transferencia.deJson(Map<String, dynamic> json) {
+    return Transferencia(
+      json['valor'],
+      json['numeroConta'],
+      id: json['id'],
+    );
+  }
 }

@@ -125,7 +125,7 @@ class ListaTransferenciasState extends State<ListaTransferencias> {
 
 class TransferenciaWebClient {
   Future<http.Response> buscaTransacoes() {
-    return http.get("http://192.168.1.221:8080/transacoes");
+    return http.get("http://192.168.1.221:8080/transferencias");
   }
 
   List<Transferencia> fromJson(Map<String, dynamic> json) {
